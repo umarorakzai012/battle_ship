@@ -12,6 +12,7 @@ dependencies:
   firebase_database: ^10.4.0
   flutter:
     sdk: flutter
+  flutter_riverpod: ^2.4.9
   logger: ^2.0.2+1
   randomstring_dart: ^0.0.4
 

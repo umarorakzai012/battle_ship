@@ -1,4 +1,5 @@
-import 'package:battle_ship/functions.dart';
+import 'package:battle_ship/global.dart';
+import 'package:battle_ship/server/join_a_server.dart';
 import 'package:battle_ship/server/make_a_server.dart';
 import 'package:flutter/material.dart';
 
@@ -9,11 +10,8 @@ class MakeOrJoin extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          margin: EdgeInsets.symmetric(horizontal: getWidth(context, 2)),
-          child: const Text(
-            "BattleShip",
-          ),
+        title: const Text(
+          "BattleShip",
         ),
         backgroundColor: const Color(0xFF223A8E),
         foregroundColor: Colors.white,
@@ -38,10 +36,11 @@ class MakeOrJoin extends StatelessWidget {
                   ),
                 ),
                 onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MakeAServer(),
-                    )),
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MakeAServer(),
+                  ),
+                ),
                 child: const Text("Make a Server"),
               ),
               SizedBox(
@@ -65,7 +64,12 @@ class MakeOrJoin extends StatelessWidget {
                     const Color(0xFFFFFFFF),
                   ),
                 ),
-                onPressed: () => {},
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const JoinAServer(),
+                  ),
+                ),
                 child: const Text("Join a Server"),
               ),
             ],

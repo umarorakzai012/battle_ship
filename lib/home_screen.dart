@@ -1,27 +1,17 @@
-import 'package:battle_ship/functions.dart';
+import 'package:battle_ship/global.dart';
 import 'package:battle_ship/server/make_or_join.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends ConsumerWidget {
+  final controller = TextEditingController();
+  final fKey = GlobalKey<FormState>();
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  var controller = TextEditingController();
-  String username = "";
-
-  void onSubmit(String? text) {
-    text ??= controller.text.trim();
-    controller.clear();
-    username = text;
-    setState(() {});
-  }
+  HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    String username = ref.watch(userNameStateProvider);
     return Scaffold(
       appBar: AppBar(
         title: Container(
@@ -33,76 +23,103 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF223A8E),
         foregroundColor: Colors.white,
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: getHeight(context, 20),
-          ),
-          Text(
-            username,
-            style: const TextStyle(fontSize: 25),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(
-              vertical: getHeight(context, 3),
-              horizontal: getWidth(context, 6),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: getHeight(context, 20),
             ),
-            child: TextField(
-              controller: controller,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Enter Username",
-                labelText: "Username",
-              ),
-              onSubmitted: onSubmit,
+            Text(
+              username,
+              style: const TextStyle(fontSize: 25),
             ),
-          ),
-          ElevatedButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                horizontal: getWidth(context, 7),
-                vertical: getHeight(context, 2),
-              )),
-              backgroundColor: MaterialStateProperty.all(
-                const Color(0xFF223A8E),
+            Container(
+              margin: EdgeInsets.symmetric(
+                vertical: getHeight(context, 3),
+                horizontal: getWidth(context, 6),
               ),
-              foregroundColor: MaterialStateProperty.all(
-                const Color(0xFFFFFFFF),
-              ),
-            ),
-            onPressed: () => onSubmit(null),
-            child: const Text(
-              "Submit",
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
-          SizedBox(
-            height: getHeight(context, 3),
-          ),
-          ElevatedButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                horizontal: getWidth(context, 7),
-                vertical: getHeight(context, 2),
-              )),
-              backgroundColor: MaterialStateProperty.all(
-                const Color(0xFF223A8E),
-              ),
-              foregroundColor: MaterialStateProperty.all(
-                const Color(0xFFFFFFFF),
+              child: Form(
+                key: fKey,
+                child: TextFormField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Enter Username",
+                    labelText: "Username",
+                  ),
+                  onFieldSubmitted: (value) {
+                    if (fKey.currentState!.validate() && value.isNotEmpty) {
+                      controller.clear();
+                      ref.read(userNameStateProvider.notifier).state = value;
+                    }
+                  },
+                  validator: (value) {
+                    if ((value == null || value.isEmpty) && username.isEmpty) {
+                      return "Required";
+                    }
+                    return null;
+                  },
+                ),
               ),
             ),
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const MakeOrJoin(),
+            ElevatedButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                  horizontal: getWidth(context, 7),
+                  vertical: getHeight(context, 2),
                 )),
-            child: const Text(
-              "Enter",
-              style: TextStyle(fontSize: 18),
+                backgroundColor: MaterialStateProperty.all(
+                  const Color(0xFF223A8E),
+                ),
+                foregroundColor: MaterialStateProperty.all(
+                  const Color(0xFFFFFFFF),
+                ),
+              ),
+              onPressed: () {
+                String value = controller.text;
+                if (fKey.currentState!.validate() && value.isNotEmpty) {
+                  controller.clear();
+                  ref.read(userNameStateProvider.notifier).state = value;
+                }
+              },
+              child: const Text(
+                "Submit",
+                style: TextStyle(fontSize: 18),
+              ),
             ),
-          ),
-        ],
+            SizedBox(
+              height: getHeight(context, 3),
+            ),
+            ElevatedButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+                  horizontal: getWidth(context, 7),
+                  vertical: getHeight(context, 2),
+                )),
+                backgroundColor: MaterialStateProperty.all(
+                  const Color(0xFF223A8E),
+                ),
+                foregroundColor: MaterialStateProperty.all(
+                  const Color(0xFFFFFFFF),
+                ),
+              ),
+              onPressed: () {
+                if (fKey.currentState!.validate()) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MakeOrJoin(),
+                    ),
+                  );
+                }
+              },
+              child: const Text(
+                "Enter",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
