@@ -24,10 +24,12 @@ class MakeOrJoin extends StatelessWidget {
             children: [
               ElevatedButton(
                 style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                    horizontal: getWidth(context, 7),
-                    vertical: getHeight(context, 2),
-                  )),
+                  padding: MaterialStateProperty.all(
+                    EdgeInsets.symmetric(
+                      horizontal: getWidth(context, 7),
+                      vertical: getHeight(context, 2),
+                    ),
+                  ),
                   backgroundColor: MaterialStateProperty.all(
                     const Color(0xFF223A8E),
                   ),

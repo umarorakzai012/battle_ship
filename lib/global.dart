@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
 
 double getWidth(BuildContext context, double percent) {
   return MediaQuery.of(context).size.width * (percent / 100);
@@ -16,6 +17,8 @@ final userNameStateProvider = StateProvider<String>((ref) => "");
 final serverNameStateProvider = StateProvider<String>((ref) => "");
 
 final passwordStateProvider = StateProvider<String>((ref) => "");
+
+final uuidStateProvider = StateProvider<String>((ref) => const Uuid().v4());
 
 final serverStream = StreamProvider<DatabaseEvent>((ref) {
   var firebaseApp = Firebase.app();
