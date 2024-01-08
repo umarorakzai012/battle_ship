@@ -67,7 +67,7 @@ class MakeOrJoin extends StatelessWidget {
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const JoinAServer(),
+                    builder: (context) => JoinAServer(),
                   ),
                 ),
                 child: const Text("Join a Server"),
