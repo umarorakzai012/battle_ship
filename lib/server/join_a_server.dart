@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:battle_ship/global.dart';
 import 'package:battle_ship/server/in_server.dart';
 import 'package:flutter/material.dart';
