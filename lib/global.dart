@@ -32,3 +32,30 @@ final serverStream = StreamProvider<DatabaseEvent>((ref) {
 
   return ref.onValue;
 });
+
+String splitString = "<^_^>";
+
+AppBar getAppBar(BuildContext context) {
+  return AppBar(
+    toolbarHeight: getHeight(context, 10),
+    title: const Text(
+      "BattleShip",
+    ),
+    backgroundColor: const Color(0xFF223A8E),
+    foregroundColor: Colors.white,
+  );
+}
+
+// // ., $, #, [, ], /, or ASCII control characters 0-31 or 127
+
+// bool validateString(String text) {
+//   List<String> vali = ['.', r'$', '#', '[', ']', '/'];
+//   for (var i = 0; i < 32; i++) {
+//     vali.add(String.fromCharCode(i));
+//   }
+//   vali.add(String.fromCharCode(127));
+//   for (var i = 0; i < vali.length; i++) {
+//     if (text.contains(vali[i])) return false;
+//   }
+//   return true;
+// }

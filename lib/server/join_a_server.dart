@@ -1,6 +1,7 @@
 import 'package:battle_ship/global.dart';
 import 'package:battle_ship/server/in_server.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class JoinAServer extends ConsumerWidget {
@@ -14,20 +15,22 @@ class JoinAServer extends ConsumerWidget {
     Map<Object?, Object?>? serverData;
     var streamServer = ref.watch(serverStream);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "BattleShip",
-        ),
-        backgroundColor: const Color(0xFF223A8E),
-        foregroundColor: Colors.white,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _displayTextInputDialog(context, "Enter Code",
-            "Enter server code", codeController, onCodeSubmit, serverData, ""),
-        backgroundColor: const Color(0xFF223A8E),
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ),
+      appBar: getAppBar(context),
+      floatingActionButton: !streamServer.isLoading
+          ? FloatingActionButton(
+              onPressed: () => _displayTextInputDialog(
+                  context,
+                  "Enter Code",
+                  "Enter server code",
+                  codeController,
+                  onCodeSubmit,
+                  serverData,
+                  ""),
+              backgroundColor: const Color(0xFF223A8E),
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.add),
+            )
+          : null,
       body: streamServer.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) => const Text("Somekind of error"),
@@ -46,11 +49,16 @@ class JoinAServer extends ConsumerWidget {
             return ListView.builder(
               itemCount: serverList.length,
               itemBuilder: (context, index) {
-                String code = serverList[index] as String;
-                var serverDetails = servers[code] as Map<Object?, Object?>;
-                var password = serverDetails['password'] as String?;
-                var name = serverDetails['name'] as String;
-                if (serverDetails.length == 4) return const SizedBox();
+                String servernameCodePassword = serverList[index] as String;
+                var serverDetails =
+                    servers[servernameCodePassword] as Map<Object?, Object?>;
+                var split = servernameCodePassword.split(splitString);
+                var name = split[0];
+                var password = split.length == 3 ? split[2] : "";
+
+                // server full
+                if (serverDetails.length == 2) return const SizedBox();
+
                 return Container(
                   margin: EdgeInsets.symmetric(
                     vertical: getHeight(context, 2),
@@ -70,13 +78,11 @@ class JoinAServer extends ConsumerWidget {
                         fontSize: 20,
                       ),
                     ),
-                    trailing: password == null || password.isEmpty
-                        ? null
-                        : const Icon(Icons.lock),
+                    trailing: password.isEmpty ? null : const Icon(Icons.lock),
                     onTap: () {
-                      if (password == null || password.isEmpty) {
-                        onPasswordSubmit(
-                            context, serverDetails, password ?? "", code);
+                      if (password.isEmpty) {
+                        onPasswordSubmit(context, serverDetails, password,
+                            servernameCodePassword);
                       } else {
                         _displayTextInputDialog(
                           context,
@@ -85,7 +91,7 @@ class JoinAServer extends ConsumerWidget {
                           passwordController,
                           onPasswordSubmit,
                           serverDetails,
-                          code,
+                          servernameCodePassword,
                         );
                       }
                     },
@@ -103,15 +109,17 @@ class JoinAServer extends ConsumerWidget {
       String inputCode, String garbage) {
     if (serverData != null) {
       for (var code in serverData.keys) {
-        var serverDetails = serverData[code]! as Map<Object?, Object?>;
-        String actualCode = code as String;
+        var split = code.toString().split(splitString);
+        String actualCode = split[1];
+        String password = split.length == 3 ? split[2] : "";
         if (actualCode == inputCode) {
-          var password = serverDetails['password'] as String?;
-          if (password == null || password.isEmpty) {
-            Navigator.popUntil(context, (route) => route.isFirst);
-            Navigator.pushReplacement(
+          if (password.isEmpty) {
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => InServer(code: code)),
+              MaterialPageRoute(
+                builder: (context) =>
+                    InServer(servernameCodePassword: code.toString()),
+              ),
             );
           } else {
             _displayTextInputDialog(
@@ -120,8 +128,8 @@ class JoinAServer extends ConsumerWidget {
                 "Password",
                 passwordController,
                 onPasswordSubmit,
-                serverDetails,
-                actualCode);
+                serverData,
+                code.toString());
           }
           return;
         }
@@ -130,15 +138,21 @@ class JoinAServer extends ConsumerWidget {
     showSnackBar(context, "Wrong Code");
   }
 
-  void onPasswordSubmit(BuildContext context,
-      Map<Object?, Object?>? serverDetails, String inputPassword, String code) {
+  void onPasswordSubmit(
+      BuildContext context,
+      Map<Object?, Object?>? serverDetails,
+      String inputPassword,
+      String details) {
+    var split = details.split(splitString);
+    var password = split.length == 3 ? split[2] : "";
     if (serverDetails != null) {
-      String actualPassword = serverDetails['password'] as String;
+      String actualPassword = password;
       if (actualPassword == inputPassword) {
-        Navigator.popUntil(context, (route) => route.isFirst);
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => InServer(code: code)),
+          MaterialPageRoute(
+            builder: (context) => InServer(servernameCodePassword: details),
+          ),
         );
         return;
       }
@@ -171,6 +185,9 @@ class JoinAServer extends ConsumerWidget {
             decoration: InputDecoration(
               hintText: hint,
             ),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]')),
+            ],
           ),
           actions: <Widget>[
             MaterialButton(

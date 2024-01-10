@@ -5,27 +5,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InServer extends ConsumerWidget {
-  final String code;
-  const InServer({super.key, required this.code});
+  final String servernameCodePassword;
+  const InServer({super.key, required this.servernameCodePassword});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var streamServer = ref.watch(serverStream);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "BattleShip",
-        ),
-        backgroundColor: const Color(0xFF223A8E),
-        foregroundColor: Colors.white,
-      ),
+      appBar: getAppBar(context),
       body: streamServer.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) =>
             const Text("Somekind of error in InServer"),
         data: (data) {
-          var values = data.snapshot.child(code).value as Map<Object?, Object?>;
-          String name = values['name'] as String;
+          var values = data.snapshot.child(servernameCodePassword).value
+              as Map<Object?, Object?>;
+          var split = servernameCodePassword.split(splitString);
+          String name = split[0];
+          String code = split[1];
           return Stack(
             children: [
               Positioned(

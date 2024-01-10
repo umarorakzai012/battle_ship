@@ -1,6 +1,7 @@
 import 'package:battle_ship/global.dart';
 import 'package:battle_ship/server/make_or_join.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -13,16 +14,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     String username = ref.watch(userNameStateProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: Container(
-          margin: EdgeInsets.symmetric(horizontal: getWidth(context, 2)),
-          child: const Text(
-            "BattleShip",
-          ),
-        ),
-        backgroundColor: const Color(0xFF223A8E),
-        foregroundColor: Colors.white,
-      ),
+      appBar: getAppBar(context),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -47,6 +39,9 @@ class HomeScreen extends ConsumerWidget {
                     hintText: "Enter Username",
                     labelText: "Username",
                   ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]')),
+                  ],
                   onFieldSubmitted: (value) {
                     if (fKey.currentState!.validate() && value.isNotEmpty) {
                       controller.clear();
@@ -79,6 +74,7 @@ class HomeScreen extends ConsumerWidget {
                 String value = controller.text;
                 if (fKey.currentState!.validate() && value.isNotEmpty) {
                   controller.clear();
+                  fKey.currentState!.reset();
                   ref.read(userNameStateProvider.notifier).state = value;
                 }
               },

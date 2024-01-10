@@ -1,5 +1,6 @@
 import 'package:battle_ship/global.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MakeAServer extends ConsumerWidget {
@@ -10,13 +11,7 @@ class MakeAServer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "BattleShip",
-        ),
-        backgroundColor: const Color(0xFF223A8E),
-        foregroundColor: Colors.white,
-      ),
+      appBar: getAppBar(context),
       body: SingleChildScrollView(
         child: SizedBox(
           height: getHeight(context, 100),
@@ -40,6 +35,9 @@ class MakeAServer extends ConsumerWidget {
                       hintText: "Enter Server Name",
                       labelText: "Server Name",
                     ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]')),
+                    ],
                     validator: (value) {
                       if (value == null || value.isEmpty) return "*Required";
                       return null;
@@ -66,6 +64,9 @@ class MakeAServer extends ConsumerWidget {
                     labelText: "Password",
                     helperText: "*leave empty for no password",
                   ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp('[a-zA-Z0-9_]')),
+                  ],
                   onSubmitted: (value) {
                     ref.read(passwordStateProvider.notifier).state = value;
                   },
