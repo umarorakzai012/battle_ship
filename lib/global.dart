@@ -18,9 +18,11 @@ final serverNameStateProvider = StateProvider<String>((ref) => "");
 
 final passwordStateProvider = StateProvider<String>((ref) => "");
 
+final codeStateProvider = StateProvider<String>((ref) => "");
+
 final uuidStateProvider = StateProvider<String>((ref) => const Uuid().v4());
 
-final serverStream = StreamProvider<DatabaseEvent>((ref) {
+final dbrefStateProvider = StateProvider<DatabaseReference>((ref) {
   var firebaseApp = Firebase.app();
   var fbInstance = FirebaseDatabase.instanceFor(
     app: firebaseApp,
@@ -28,10 +30,12 @@ final serverStream = StreamProvider<DatabaseEvent>((ref) {
         "https://fir-app-11707-default-rtdb.asia-southeast1.firebasedatabase.app/",
   );
 
-  var ref = fbInstance.ref("server");
-
-  return ref.onValue;
+  return fbInstance.ref("server");
 });
+
+final dbrefStreamProvider = StreamProvider<DatabaseEvent>(
+  (ref) => ref.watch(dbrefStateProvider).onValue,
+);
 
 String splitString = "<^_^>";
 

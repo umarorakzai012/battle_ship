@@ -1,116 +1,145 @@
-import 'dart:developer';
-
 import 'package:battle_ship/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InServer extends ConsumerWidget {
-  final String servernameCodePassword;
-  const InServer({super.key, required this.servernameCodePassword});
+  const InServer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var streamServer = ref.watch(serverStream);
-    return Scaffold(
-      appBar: getAppBar(context),
-      body: streamServer.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) =>
-            const Text("Somekind of error in InServer"),
-        data: (data) {
-          var values = data.snapshot.child(servernameCodePassword).value
-              as Map<Object?, Object?>;
-          var split = servernameCodePassword.split(splitString);
-          String name = split[0];
-          String code = split[1];
-          return Stack(
-            children: [
-              Positioned(
-                width: getWidth(context, 100),
-                height: getHeight(context, 100),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: getHeight(context, 5),
-                    ),
-                    Center(
-                      child: Text(
-                        name,
-                        style: const TextStyle(fontSize: 25),
+    var streamServer = ref.watch(dbrefStreamProvider);
+    String serverName = ref.watch(serverNameStateProvider);
+    String code = ref.watch(codeStateProvider);
+    String username = ref.watch(userNameStateProvider);
+    String uuid = ref.watch(uuidStateProvider);
+
+    // String password = ref.watch(passwordStateProvider);
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (!didPop) return;
+        ref.read(dbrefStateProvider.notifier).state.child(uuid).remove();
+
+        ref.read(dbrefStateProvider.notifier).state =
+            ref.read(dbrefStateProvider.notifier).state.parent!;
+      },
+      child: Scaffold(
+        appBar: getAppBar(context),
+        body: streamServer.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stackTrace) =>
+              const Text("Somekind of error in InServer"),
+          data: (data) {
+            // Updating username and password to database
+            data.snapshot.ref.child(uuid).once().then((value) {
+              if (value.snapshot.value == null) {
+                data.snapshot.ref.child(uuid).set({
+                  'username': username,
+                  'ready': false,
+                });
+              }
+            });
+            Map<Object?, Object?> values = {};
+            int numberOfReady = 0;
+            if (data.snapshot.value != null) {
+              values = data.snapshot.value as Map<Object?, Object?>;
+              for (var value in values.keys) {
+                var temp = values[value] as Map<Object?, Object?>;
+                var ready = temp['ready'] as bool;
+                if (ready) ++numberOfReady;
+              }
+            }
+            return Stack(
+              children: [
+                Positioned(
+                  width: getWidth(context, 100),
+                  height: getHeight(context, 100),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: getHeight(context, 5),
                       ),
-                    ),
-                    SizedBox(
-                      height: getHeight(context, 2),
-                    ),
-                    if (values.length == 2) ...[
-                      const Center(
-                          child: Text(
-                        "No Player in Server",
-                        style: TextStyle(fontSize: 15),
-                      )),
-                    ] else ...[
-                      ...players(context, values)
+                      Center(
+                        child: Text(
+                          serverName,
+                          style: const TextStyle(fontSize: 25),
+                        ),
+                      ),
+                      SizedBox(
+                        height: getHeight(context, 2),
+                      ),
+                      if (values.isEmpty) ...[
+                        const Center(
+                            child: Text(
+                          "No Player in Server",
+                          style: TextStyle(fontSize: 15),
+                        )),
+                      ] else
+                        ...players(context, values),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              Positioned(
-                bottom: getWidth(context, 0),
-                // left: getWidth(context, 45),
-                width: getWidth(context, 100),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            padding:
-                                MaterialStateProperty.all(EdgeInsets.symmetric(
-                              horizontal: getWidth(context, 7),
-                              vertical: getHeight(context, 2),
-                            )),
-                            backgroundColor: MaterialStateProperty.all(
-                              const Color(0xFF223A8E),
+                Positioned(
+                  bottom: getWidth(context, 0),
+                  width: getWidth(context, 100),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          ElevatedButton(
+                            style: ButtonStyle(
+                              padding: MaterialStateProperty.all(
+                                  EdgeInsets.symmetric(
+                                horizontal: getWidth(context, 7),
+                                vertical: getHeight(context, 2),
+                              )),
+                              backgroundColor: MaterialStateProperty.all(
+                                const Color(0xFF223A8E),
+                              ),
+                              foregroundColor: MaterialStateProperty.all(
+                                const Color(0xFFFFFFFF),
+                              ),
                             ),
-                            foregroundColor: MaterialStateProperty.all(
-                              const Color(0xFFFFFFFF),
+                            onPressed: () {
+                              Map<Object?, Object?> temp =
+                                  values[uuid] as Map<Object?, Object?>;
+                              bool ready = temp['ready'] as bool;
+                              data.snapshot.ref.child(uuid).update(
+                                {'ready': !ready},
+                              );
+                            },
+                            child: Text(
+                              "Start(${numberOfReady.toString()}/2)",
+                              style: const TextStyle(fontSize: 18),
                             ),
                           ),
-                          onPressed: () {
-                            log("Pressed!");
-                          },
-                          child: const Text(
-                            "Start(1/2)",
-                            style: TextStyle(fontSize: 18),
+                          SizedBox(
+                            height: getHeight(context, 3),
                           ),
-                        ),
-                        SizedBox(
-                          height: getHeight(context, 3),
-                        ),
-                        const Text(
-                          "Server Code",
-                          style: TextStyle(
-                            fontSize: 30,
+                          const Text(
+                            "Server Code",
+                            style: TextStyle(
+                              fontSize: 30,
+                            ),
                           ),
-                        ),
-                        Text(
-                          code,
-                          style: const TextStyle(
-                            fontSize: 30,
+                          Text(
+                            code,
+                            style: const TextStyle(
+                              fontSize: 30,
+                            ),
                           ),
-                        ),
-                        SizedBox(
-                          height: getHeight(context, 5),
-                        ),
-                      ],
-                    ),
-                  ],
+                          SizedBox(
+                            height: getHeight(context, 5),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

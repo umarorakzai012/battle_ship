@@ -1,7 +1,9 @@
 import 'package:battle_ship/global.dart';
+import 'package:battle_ship/server/in_server.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:randomstring_dart/randomstring_dart.dart';
 
 class MakeAServer extends ConsumerWidget {
   MakeAServer({super.key});
@@ -87,10 +89,39 @@ class MakeAServer extends ConsumerWidget {
                 ),
                 onPressed: () {
                   if (fKey.currentState!.validate()) {
+                    var serverName = serverController.text;
+                    var password = passwordController.text;
                     ref.read(serverNameStateProvider.notifier).state =
-                        serverController.text;
-                    ref.read(passwordStateProvider.notifier).state =
-                        passwordController.text;
+                        serverName;
+                    ref.read(passwordStateProvider.notifier).state = password;
+                    var rs = RandomString();
+                    String code = rs.getRandomString(
+                      lowersCount: 5,
+                      uppersCount: 0,
+                      canSpecialRepeat: false,
+                      numbersCount: 0,
+                      specials: '',
+                      specialsCount: 0,
+                    );
+                    ref.read(codeStateProvider.notifier).state = code;
+
+                    String servernameCodePassword =
+                        "$serverName$splitString$code";
+                    if (password.isNotEmpty) {
+                      servernameCodePassword =
+                          "$servernameCodePassword$splitString$password";
+                    }
+
+                    ref.read(dbrefStateProvider.notifier).state = ref
+                        .read(dbrefStateProvider.notifier)
+                        .state
+                        .child(servernameCodePassword);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const InServer(),
+                      ),
+                    );
                   }
                 },
                 child: const Text("Start the Server"),

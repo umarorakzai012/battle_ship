@@ -13,19 +13,21 @@ class JoinAServer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     Map<Object?, Object?>? serverData;
-    var streamServer = ref.watch(serverStream);
+    var streamServer = ref.watch(dbrefStreamProvider);
     return Scaffold(
       appBar: getAppBar(context),
       floatingActionButton: !streamServer.isLoading
           ? FloatingActionButton(
               onPressed: () => _displayTextInputDialog(
-                  context,
-                  "Enter Code",
-                  "Enter server code",
-                  codeController,
-                  onCodeSubmit,
-                  serverData,
-                  ""),
+                context,
+                "Enter Code",
+                "Enter server code",
+                codeController,
+                onCodeSubmit,
+                serverData,
+                "",
+                ref,
+              ),
               backgroundColor: const Color(0xFF223A8E),
               foregroundColor: Colors.white,
               child: const Icon(Icons.add),
@@ -81,8 +83,13 @@ class JoinAServer extends ConsumerWidget {
                     trailing: password.isEmpty ? null : const Icon(Icons.lock),
                     onTap: () {
                       if (password.isEmpty) {
-                        onPasswordSubmit(context, serverDetails, password,
-                            servernameCodePassword);
+                        onPasswordSubmit(
+                          context,
+                          serverDetails,
+                          password,
+                          servernameCodePassword,
+                          ref,
+                        );
                       } else {
                         _displayTextInputDialog(
                           context,
@@ -92,6 +99,7 @@ class JoinAServer extends ConsumerWidget {
                           onPasswordSubmit,
                           serverDetails,
                           servernameCodePassword,
+                          ref,
                         );
                       }
                     },
@@ -106,7 +114,7 @@ class JoinAServer extends ConsumerWidget {
   }
 
   void onCodeSubmit(BuildContext context, Map<Object?, Object?>? serverData,
-      String inputCode, String garbage) {
+      String inputCode, String garbage, WidgetRef ref) {
     if (serverData != null) {
       for (var code in serverData.keys) {
         var split = code.toString().split(splitString);
@@ -114,22 +122,18 @@ class JoinAServer extends ConsumerWidget {
         String password = split.length == 3 ? split[2] : "";
         if (actualCode == inputCode) {
           if (password.isEmpty) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    InServer(servernameCodePassword: code.toString()),
-              ),
-            );
+            onPasswordSubmit(context, serverData, "", code.toString(), ref);
           } else {
             _displayTextInputDialog(
-                context,
-                "Enter Password",
-                "Password",
-                passwordController,
-                onPasswordSubmit,
-                serverData,
-                code.toString());
+              context,
+              "Enter Password",
+              "Password",
+              passwordController,
+              onPasswordSubmit,
+              serverData,
+              code.toString(),
+              ref,
+            );
           }
           return;
         }
@@ -142,16 +146,24 @@ class JoinAServer extends ConsumerWidget {
       BuildContext context,
       Map<Object?, Object?>? serverDetails,
       String inputPassword,
-      String details) {
+      String details,
+      WidgetRef ref) {
     var split = details.split(splitString);
+    var serverName = split[0];
+    var code = split[1];
     var password = split.length == 3 ? split[2] : "";
     if (serverDetails != null) {
       String actualPassword = password;
       if (actualPassword == inputPassword) {
+        ref.read(serverNameStateProvider.notifier).state = serverName;
+        ref.read(codeStateProvider.notifier).state = code;
+        ref.read(passwordStateProvider.notifier).state = password;
+        ref.read(dbrefStateProvider.notifier).state =
+            ref.read(dbrefStateProvider.notifier).state.child(details);
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => InServer(servernameCodePassword: details),
+            builder: (context) => const InServer(),
           ),
         );
         return;
@@ -170,10 +182,12 @@ class JoinAServer extends ConsumerWidget {
       String title,
       String hint,
       TextEditingController controller,
-      void Function(BuildContext, Map<Object?, Object?>?, String, String)
+      void Function(
+              BuildContext, Map<Object?, Object?>?, String, String, WidgetRef)
           onSubmit,
       Map<Object?, Object?>? send,
-      String additional) async {
+      String additional,
+      WidgetRef ref) async {
     return showDialog(
       context: context,
       builder: (context) {
@@ -201,7 +215,7 @@ class JoinAServer extends ConsumerWidget {
               textColor: Colors.white,
               onPressed: () {
                 Navigator.pop(context);
-                onSubmit(context, send, controller.text, additional);
+                onSubmit(context, send, controller.text, additional, ref);
                 controller.clear();
               },
               child: const Text('Submit'),
