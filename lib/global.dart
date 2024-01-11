@@ -4,6 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
+/*
+  0 - nothing
+  1 - part
+  2 - hit part
+  3 - part ship destroyed
+  4 - Water
+  5 - visited, for bactracking
+*/
+
 double getWidth(BuildContext context, double percent) {
   return MediaQuery.of(context).size.width * (percent / 100);
 }
@@ -37,28 +46,15 @@ final yourBoardStateProvider = StateProvider<List<List<int>>>(
   },
 );
 
-final opponentBoardStateProvider = StateProvider<List<List<int>>>(
-  (ref) {
-    List<List<int>> board = [];
-    for (var i = 0; i < 7; i++) {
-      board.add([]);
-      for (var j = 0; j < 7; j++) {
-        board[i].add(0);
-      }
-    }
-    return board;
-  },
-);
-
 final dbrefStateProvider = StateProvider<DatabaseReference>((ref) {
   var firebaseApp = Firebase.app();
-  var fbInstance = FirebaseDatabase.instance;
-  // var fbInstance = FirebaseDatabase.instanceFor(
-  //   app: firebaseApp,
-  //   databaseURL:
-  //       "https://fir-app-11707-default-rtdb.asia-southeast1.firebasedatabase.app/",
-  // );
-  fbInstance.useDatabaseEmulator("127.0.0.1", 9000);
+  // var fbInstance = FirebaseDatabase.instance;
+  var fbInstance = FirebaseDatabase.instanceFor(
+    app: firebaseApp,
+    databaseURL:
+        "https://fir-app-11707-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  );
+  // fbInstance.useDatabaseEmulator("127.0.0.1", 9000);
 
   return fbInstance.ref("server");
 });

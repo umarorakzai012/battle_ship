@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:battle_ship/game_play/game.dart';
 import 'package:battle_ship/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -10,6 +11,8 @@ class MakeShip extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    double blockSize = 11.6;
+
     var streamServer = ref.watch(dbrefStreamProvider);
     String uuid = ref.watch(uuidStateProvider);
     var board = ref.watch(yourBoardStateProvider);
@@ -38,6 +41,9 @@ class MakeShip extends ConsumerWidget {
             int ready = 0;
             bool status = false;
             if (data.snapshot.value != null) {
+              if (data.snapshot.ref.parent?.key! != "making_ship") {
+                return const SizedBox();
+              }
               var players = data.snapshot.value as Map<Object?, Object?>;
               for (var key in players.keys) {
                 var player = players[key] as Map<Object?, Object?>;
@@ -45,30 +51,32 @@ class MakeShip extends ConsumerWidget {
                 ready += player['ready'] as bool ? 1 : 0;
               }
               SchedulerBinding.instance.addPostFrameCallback((time) {
-                Navigator.popUntil(context, (route) => route.isFirst);
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const MakeShip(),
-                //   ),
-                // );
-                ref.read(dbrefStateProvider.notifier).state = ref
-                    .read(dbrefStateProvider.notifier)
-                    .state
-                    .root
-                    .child('ongoing')
-                    .child(data.snapshot.key!);
-                ref.read(dbrefStateProvider.notifier).state.child(uuid).set({
-                  'username': ref.read(userNameStateProvider.notifier).state,
-                  'board': ref.read(yourBoardStateProvider.notifier).state,
-                  'turn': ref.read(turnStateProvider.notifier).state
-                });
-                ref
-                    .read(dbrefStateProvider.notifier)
-                    .state
-                    .child(uuid)
-                    .onDisconnect()
-                    .remove();
+                if (ready == 2) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const Game(),
+                    ),
+                  );
+                  ref.read(dbrefStateProvider.notifier).state = ref
+                      .read(dbrefStateProvider.notifier)
+                      .state
+                      .root
+                      .child('ongoing')
+                      .child(data.snapshot.key!);
+                  ref.read(dbrefStateProvider.notifier).state.child(uuid).set({
+                    'username': ref.read(userNameStateProvider.notifier).state,
+                    'board': ref.read(yourBoardStateProvider.notifier).state,
+                    'turn': ref.read(turnStateProvider.notifier).state
+                  });
+                  ref
+                      .read(dbrefStateProvider.notifier)
+                      .state
+                      .child(uuid)
+                      .onDisconnect()
+                      .remove();
+                }
               });
             }
             return SingleChildScrollView(
@@ -80,15 +88,15 @@ class MakeShip extends ConsumerWidget {
                       right: getWidth(context, 8),
                       top: getWidth(context, 4),
                     ),
-                    width: getWidth(context, 7 * 11.6),
-                    height: getWidth(context, (7 * 11.6) + 5),
+                    width: getWidth(context, 7 * blockSize),
+                    height: getWidth(context, (7 * blockSize) + 5),
                     child: ListView.builder(
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: board.length,
                       itemBuilder: (context, i) {
                         return SizedBox(
-                          width: getWidth(context, 7 * 11.6),
-                          height: getWidth(context, 11.6),
+                          width: getWidth(context, 7 * blockSize),
+                          height: getWidth(context, blockSize),
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             physics: const NeverScrollableScrollPhysics(),
@@ -112,8 +120,8 @@ class MakeShip extends ConsumerWidget {
                                   });
                                 },
                                 child: Container(
-                                  width: getWidth(context, 11.6),
-                                  height: getWidth(context, 11.6),
+                                  width: getWidth(context, blockSize),
+                                  height: getWidth(context, blockSize),
                                   decoration: BoxDecoration(
                                     color: board[i][j] == 1
                                         ? const Color(0xCA223A8E)

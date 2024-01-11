@@ -8,3 +8,8 @@ opt-out of single project mode add/set the singleProjectMode: false property in
 the firebase.json emulators config. 
 11:18:11.601 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO com.firebase.core.namespace.NamespaceActor - fir-app-11707 successfully activated FBKV (SurveyIdle(0)) wait: 4ms, init: 0ms
 12:06:47.617 [NamespaceSystem-blocking-namespace-operation-dispatcher-215] INFO com.firebase.core.namespace.StateManager - Namespace fir-app-11707-default-rtdb status Active to Active
+22:12:01.347 [Thread-0] INFO com.firebase.server.forge.App$ - Attempting graceful shutdown.
+22:12:01.697 [NamespaceSystem-akka.actor.default-dispatcher-1495] INFO com.firebase.core.namespace.Terminator$Terminator - 2 actors left to terminate: fir-app-11707-default-rtdb, fir-app-11707
+22:12:01.764 [NamespaceSystem-akka.actor.default-dispatcher-1494] INFO com.firebase.core.namespace.NamespaceActor - stopped namespace actor for fir-app-11707-default-rtdb
+22:12:01.764 [NamespaceSystem-akka.actor.default-dispatcher-1495] INFO com.firebase.core.namespace.NamespaceActor - stopped namespace actor for fir-app-11707
+22:12:01.804 [Thread-0] INFO com.firebase.server.forge.App$ - Graceful shutdown complete.
