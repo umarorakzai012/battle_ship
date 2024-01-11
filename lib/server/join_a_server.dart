@@ -148,20 +148,38 @@ class JoinAServer extends ConsumerWidget {
       BuildContext context,
       Map<Object?, Object?>? serverDetails,
       String inputPassword,
-      String details,
+      String serverNameCode,
       WidgetRef ref) {
-    var split = details.split(splitString);
+    var split = serverNameCode.split(splitString);
     var serverName = split[0];
     var code = split[1];
     var password = split.length == 3 ? split[2] : "";
     if (serverDetails != null) {
       String actualPassword = password;
       if (actualPassword == inputPassword) {
+        String uuid = ref.read(uuidStateProvider.notifier).state;
         ref.read(serverNameStateProvider.notifier).state = serverName;
+
         ref.read(codeStateProvider.notifier).state = code;
+
         ref.read(passwordStateProvider.notifier).state = password;
+
+        ref.read(turnStateProvider.notifier).state = false;
+
         ref.read(dbrefStateProvider.notifier).state =
-            ref.read(dbrefStateProvider.notifier).state.child(details);
+            ref.read(dbrefStateProvider.notifier).state.child(serverNameCode);
+
+        ref.read(dbrefStateProvider.notifier).state.child(uuid).set({
+          'username': ref.read(userNameStateProvider.notifier).state,
+          'ready': false
+        });
+
+        ref
+            .read(dbrefStateProvider.notifier)
+            .state
+            .child(uuid)
+            .onDisconnect()
+            .remove();
         Navigator.push(
           context,
           MaterialPageRoute(

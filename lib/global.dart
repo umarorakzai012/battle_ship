@@ -12,7 +12,7 @@ double getHeight(BuildContext context, double percent) {
   return MediaQuery.of(context).size.height * (percent / 100);
 }
 
-final userNameStateProvider = StateProvider<String>((ref) => "");
+final userNameStateProvider = StateProvider<String>((ref) => "default");
 
 final serverNameStateProvider = StateProvider<String>((ref) => "");
 
@@ -21,6 +21,34 @@ final passwordStateProvider = StateProvider<String>((ref) => "");
 final codeStateProvider = StateProvider<String>((ref) => "");
 
 final uuidStateProvider = StateProvider<String>((ref) => const Uuid().v4());
+
+final turnStateProvider = StateProvider<bool>((ref) => false);
+
+final yourBoardStateProvider = StateProvider<List<List<int>>>(
+  (ref) {
+    List<List<int>> board = [];
+    for (var i = 0; i < 7; i++) {
+      board.add([]);
+      for (var j = 0; j < 7; j++) {
+        board[i].add(0);
+      }
+    }
+    return board;
+  },
+);
+
+final opponentBoardStateProvider = StateProvider<List<List<int>>>(
+  (ref) {
+    List<List<int>> board = [];
+    for (var i = 0; i < 7; i++) {
+      board.add([]);
+      for (var j = 0; j < 7; j++) {
+        board[i].add(0);
+      }
+    }
+    return board;
+  },
+);
 
 final dbrefStateProvider = StateProvider<DatabaseReference>((ref) {
   var firebaseApp = Firebase.app();

@@ -116,6 +116,21 @@ class MakeAServer extends ConsumerWidget {
                         .read(dbrefStateProvider.notifier)
                         .state
                         .child(servernameCodePassword);
+                    String uuid = ref.read(uuidStateProvider.notifier).state;
+                    String userName =
+                        ref.read(userNameStateProvider.notifier).state;
+                    ref
+                        .read(dbrefStateProvider.notifier)
+                        .state
+                        .child(uuid)
+                        .set({'username': userName, 'ready': false});
+                    ref
+                        .read(dbrefStateProvider.notifier)
+                        .state
+                        .child(uuid)
+                        .onDisconnect()
+                        .remove();
+                    ref.read(turnStateProvider.notifier).state = true;
                     Navigator.push(
                       context,
                       MaterialPageRoute(

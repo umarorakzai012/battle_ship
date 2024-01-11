@@ -1,7 +1,9 @@
 import 'dart:developer';
 
+import 'package:battle_ship/game_play/make_ship.dart';
 import 'package:battle_ship/global.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class InServer extends ConsumerWidget {
@@ -20,7 +22,6 @@ class InServer extends ConsumerWidget {
       onPopInvoked: (didPop) {
         if (!didPop) return;
         ref.read(dbrefStateProvider.notifier).state.child(uuid).remove();
-
         ref.read(dbrefStateProvider.notifier).state =
             ref.read(dbrefStateProvider.notifier).state.parent!;
       },
@@ -33,15 +34,15 @@ class InServer extends ConsumerWidget {
           data: (data) {
             if (data.snapshot.key! == "server") return const SizedBox();
             // Updating username and password to database
-            data.snapshot.ref.child(uuid).once().then((value) {
-              if (value.snapshot.value == null) {
-                data.snapshot.ref.child(uuid).set({
-                  'username': username,
-                  'ready': false,
-                });
-                data.snapshot.ref.child(uuid).onDisconnect().remove();
-              }
-            });
+            // data.snapshot.ref.child(uuid).once().then((value) {
+            //   if (value.snapshot.value == null) {
+            //     data.snapshot.ref.child(uuid).set({
+            //       'username': username,
+            //       'ready': false,
+            //     });
+            //     data.snapshot.ref.child(uuid).onDisconnect().remove();
+            //   }
+            // });
             Map<Object?, Object?> values = {};
             int numberOfReady = 0;
             if (data.snapshot.value != null) {
@@ -50,6 +51,34 @@ class InServer extends ConsumerWidget {
                 var temp = values[value] as Map<Object?, Object?>;
                 var ready = temp['ready'] as bool;
                 if (ready) ++numberOfReady;
+              }
+              if (numberOfReady == 2) {
+                SchedulerBinding.instance.addPostFrameCallback((time) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MakeShip(),
+                    ),
+                  );
+                  ref.read(dbrefStateProvider.notifier).state = ref
+                      .read(dbrefStateProvider.notifier)
+                      .state
+                      .root
+                      .child('making_ship')
+                      .child(data.snapshot.key!);
+                  ref.read(dbrefStateProvider.notifier).state.child(uuid).set({
+                    'username': username,
+                    'ready': false,
+                    'board': ref.read(yourBoardStateProvider.notifier).state
+                  });
+                  ref
+                      .read(dbrefStateProvider.notifier)
+                      .state
+                      .child(uuid)
+                      .onDisconnect()
+                      .remove();
+                });
               }
             }
             return Stack(
