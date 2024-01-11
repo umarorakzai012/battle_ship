@@ -117,6 +117,8 @@ class JoinAServer extends ConsumerWidget {
       String inputCode, String garbage, WidgetRef ref) {
     if (serverData != null) {
       for (var code in serverData.keys) {
+        var check = serverData[code] as Map<Object?, Object?>;
+        if (check.length == 2) continue;
         var split = code.toString().split(splitString);
         String actualCode = split[1];
         String password = split.length == 3 ? split[2] : "";

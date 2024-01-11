@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:battle_ship/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +31,7 @@ class InServer extends ConsumerWidget {
           error: (error, stackTrace) =>
               const Text("Somekind of error in InServer"),
           data: (data) {
+            if (data.snapshot.key! == "server") return const SizedBox();
             // Updating username and password to database
             data.snapshot.ref.child(uuid).once().then((value) {
               if (value.snapshot.value == null) {
@@ -36,6 +39,7 @@ class InServer extends ConsumerWidget {
                   'username': username,
                   'ready': false,
                 });
+                data.snapshot.ref.child(uuid).onDisconnect().remove();
               }
             });
             Map<Object?, Object?> values = {};

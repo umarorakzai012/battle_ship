@@ -24,11 +24,13 @@ final uuidStateProvider = StateProvider<String>((ref) => const Uuid().v4());
 
 final dbrefStateProvider = StateProvider<DatabaseReference>((ref) {
   var firebaseApp = Firebase.app();
-  var fbInstance = FirebaseDatabase.instanceFor(
-    app: firebaseApp,
-    databaseURL:
-        "https://fir-app-11707-default-rtdb.asia-southeast1.firebasedatabase.app/",
-  );
+  var fbInstance = FirebaseDatabase.instance;
+  // var fbInstance = FirebaseDatabase.instanceFor(
+  //   app: firebaseApp,
+  //   databaseURL:
+  //       "https://fir-app-11707-default-rtdb.asia-southeast1.firebasedatabase.app/",
+  // );
+  fbInstance.useDatabaseEmulator("127.0.0.1", 9000);
 
   return fbInstance.ref("server");
 });
