@@ -16,7 +16,7 @@ class Game extends ConsumerWidget {
 
     var streamServer = ref.watch(dbrefStreamProvider);
     var uuid = ref.watch(uuidStateProvider);
-    var yourBoard = ref.watch(yourBoardStateProvider);
+    // var yourBoard = ref.watch(yourBoardStateProvider);
     return PopScope(
       onPopInvoked: (didPop) {
         if (!didPop) return;
@@ -51,6 +51,7 @@ class Game extends ConsumerWidget {
               }
             }
             var opponentBoard = opponent['board'] as List<dynamic>;
+            var yourBoard = you['board'] as List<dynamic>;
             int nbyn = yourBoard.length;
             int yourPartLeft = 0, yourTotal = 0;
             for (var numbers in yourBoard) {
@@ -128,8 +129,12 @@ class Game extends ConsumerWidget {
                                     height: getWidth(context, smallBlockSize),
                                     decoration: BoxDecoration(
                                       color: mapColor[yourBoard[i][j]],
-                                      border: const Border.fromBorderSide(
-                                        BorderSide(color: Colors.black),
+                                      border: Border.fromBorderSide(
+                                        BorderSide(
+                                          color: turn
+                                              ? Colors.green
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
                                   );
@@ -208,8 +213,11 @@ class Game extends ConsumerWidget {
                                     color: opponentBoard[i][j] == 1
                                         ? mapColor[0]
                                         : mapColor[opponentBoard[i][j]],
-                                    border: const Border.fromBorderSide(
-                                      BorderSide(color: Colors.black),
+                                    border: Border.fromBorderSide(
+                                      BorderSide(
+                                        color:
+                                            turn ? Colors.green : Colors.black,
+                                      ),
                                     ),
                                   ),
                                 ),

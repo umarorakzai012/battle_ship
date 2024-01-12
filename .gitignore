@@ -25,3 +25,9 @@ doc/api/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+
+database.rules.json
+firebase.json
+autoapk.sh
+database-debug.log
+ui-debug.log
