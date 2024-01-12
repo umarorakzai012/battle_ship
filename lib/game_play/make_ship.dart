@@ -160,18 +160,7 @@ class MakeShip extends ConsumerWidget {
                     height: getHeight(context, 3),
                   ),
                   ElevatedButton(
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                        horizontal: getWidth(context, 7),
-                        vertical: getHeight(context, 2),
-                      )),
-                      backgroundColor: MaterialStateProperty.all(
-                        const Color(0xFF223A8E),
-                      ),
-                      foregroundColor: MaterialStateProperty.all(
-                        const Color(0xFFFFFFFF),
-                      ),
-                    ),
+                    style: getButtonStyle(context),
                     child: Text(
                       "Start($ready/2)",
                       style: const TextStyle(fontSize: 20),

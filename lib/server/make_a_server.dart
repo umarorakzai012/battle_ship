@@ -75,18 +75,7 @@ class MakeAServer extends ConsumerWidget {
                 ),
               ),
               ElevatedButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                    horizontal: getWidth(context, 7),
-                    vertical: getHeight(context, 2),
-                  )),
-                  backgroundColor: MaterialStateProperty.all(
-                    const Color(0xFF223A8E),
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                    const Color(0xFFFFFFFF),
-                  ),
-                ),
+                style: getButtonStyle(context),
                 onPressed: () {
                   if (fKey.currentState!.validate()) {
                     var serverName = serverController.text;

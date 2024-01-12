@@ -76,6 +76,21 @@ AppBar getAppBar(BuildContext context) {
   );
 }
 
+ButtonStyle getButtonStyle(BuildContext context) {
+  return ButtonStyle(
+    padding: MaterialStateProperty.all(EdgeInsets.symmetric(
+      horizontal: getWidth(context, 7),
+      vertical: getHeight(context, 2),
+    )),
+    backgroundColor: MaterialStateProperty.all(
+      const Color(0xFF223A8E),
+    ),
+    foregroundColor: MaterialStateProperty.all(
+      const Color(0xFFFFFFFF),
+    ),
+  );
+}
+
 // // ., $, #, [, ], /, or ASCII control characters 0-31 or 127
 
 // bool validateString(String text) {

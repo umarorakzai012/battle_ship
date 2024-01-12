@@ -1,5 +1,6 @@
 import 'package:battle_ship/global.dart';
 import 'package:battle_ship/server/make_or_join.dart';
+import 'package:battle_ship/update/update_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     String username = ref.watch(userNameStateProvider);
+    CheckUpdate(fromNavigation: false, context: context);
     return GestureDetector(
       onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
       child: Scaffold(
@@ -61,18 +63,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
               ElevatedButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                    horizontal: getWidth(context, 7),
-                    vertical: getHeight(context, 2),
-                  )),
-                  backgroundColor: MaterialStateProperty.all(
-                    const Color(0xFF223A8E),
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                    const Color(0xFFFFFFFF),
-                  ),
-                ),
+                style: getButtonStyle(context),
                 onPressed: () {
                   String value = controller.text;
                   if (fKey.currentState!.validate() && value.isNotEmpty) {
@@ -90,18 +81,7 @@ class HomeScreen extends ConsumerWidget {
                 height: getHeight(context, 3),
               ),
               ElevatedButton(
-                style: ButtonStyle(
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                    horizontal: getWidth(context, 7),
-                    vertical: getHeight(context, 2),
-                  )),
-                  backgroundColor: MaterialStateProperty.all(
-                    const Color(0xFF223A8E),
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                    const Color(0xFFFFFFFF),
-                  ),
-                ),
+                style: getButtonStyle(context),
                 onPressed: () {
                   if (fKey.currentState!.validate()) {
                     FocusManager.instance.primaryFocus?.unfocus();

@@ -15,20 +15,7 @@ class MakeOrJoin extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(
-                  EdgeInsets.symmetric(
-                    horizontal: getWidth(context, 7),
-                    vertical: getHeight(context, 2),
-                  ),
-                ),
-                backgroundColor: MaterialStateProperty.all(
-                  const Color(0xFF223A8E),
-                ),
-                foregroundColor: MaterialStateProperty.all(
-                  const Color(0xFFFFFFFF),
-                ),
-              ),
+              style: getButtonStyle(context),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -41,18 +28,7 @@ class MakeOrJoin extends StatelessWidget {
               height: getHeight(context, 3),
             ),
             ElevatedButton(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all(EdgeInsets.symmetric(
-                  horizontal: getWidth(context, 7),
-                  vertical: getHeight(context, 2),
-                )),
-                backgroundColor: MaterialStateProperty.all(
-                  const Color(0xFF223A8E),
-                ),
-                foregroundColor: MaterialStateProperty.all(
-                  const Color(0xFFFFFFFF),
-                ),
-              ),
+              style: getButtonStyle(context),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(
